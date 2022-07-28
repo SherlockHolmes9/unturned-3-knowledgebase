@@ -1,11 +1,56 @@
 # Item Data
 
 !!! info inline end
-    This page is likely outdated, you can help by submitting a pull request
+    This page may be outdated, you can help by submitting a pull request
 
-__Items__ in _Unturned_ encompass anything that can be carried in a player's in-game inventory. All items share some properties, while each item type has its own unique data. All of the data applicable to each possible item type can be found below.
+**Items** in _Unturned_ encompass anything that can be carried in a player's in-game inventory. All items share some properties, while many item types have their own unique data. All of the data applicable to each possible item type can be found below. Items that are sub versions of another Item inherit their applicable properties, for instance, anything in Attachments is also applicable to a Grip.
+
+## Formatting
+
+  **Property_name**: <*datatype*>
+
+  Some properties may have a specific default value which is applied if you do not specify one in your .dat. It's also possible to have a mathematical operation based on the values of other keys.
+
+  **Property_with_default** <*datatype*: `value`>
+
+  Some properties have different defaults depending on a prior Enum value. In this case, the enum value will appear in parentheses next to the default value.
+
+  **Property_with_default_and_enum** <*datatype*: `value`(key_1), `value`(key_2)>
+
+  Some properties may be specified in multiple key value pairs. They are denoted by a pair curly brackets (`{}`) with a series of strings in them which should be substituted for the brackets when used. Generally you can specify any number of these key/value pairs. In the case of the example, you would input this to your .dat file as 4 separate keys `Nightvision_Color_R 255`, `Nightvision_Color_G 255`, etc...
+
+  **Nightvision\_Color\_{R,G,B,A}** <*uint8*: `102, 102, 102, 0`>
+
+### Value Data Types
+
+#### Numerical
+
+| Data Type | Min                        | Max                        | Description                                    |
+| --------- | -------------------------- | -------------------------- | ---------------------------------------------- |
+| `uint8`   | 0                          | 255                        | unsigned 8 bit integer                         |
+| `uint16`  | 0                          | 65,535                     | unsigned 16 bit integer                        |
+| `uint32`  | 0                          | 65,535                     | unsigned 32 bit integer                        |
+| `uint64`  | 0                          | 18,446,744,073,709,551,615 | unsigned 64 bit integer                        |
+| `int8`    | -127                       | 127                        | signed 8 bit integer                           |
+| `int16`   | -32,768                    | 32,767                     | signed 16 bit integer                          |
+| `int32`   | -2,147,483,648             | 2,147,483,647              | signed 32 bit integer                          |
+| `int64`   | -9,223,372,036,854,775,808 | 9,223,372,036,854,775,807  | signed 64 bit integer                          |
+| `float`   | ±1.5 x 10−45               | ±3.4 x 1038                | 32 bit floating point number. Supports decimal values |
+
+#### Enum
+
+  Enums are data types with specific values, they appears on this list as "<*Enum_Name*> `key_1`, `key_2`". You can use any one of these as the value, and in a .dat file it would appear as `Enum_name key_1`.
+
+#### Flag
+
+  Flags are simple keys without a value, if you include the property in your .dat file, it's active.
 
 - [Item Data](#item-data)
+  - [Formatting](#formatting)
+    - [Value Data Types](#value-data-types)
+      - [Numerical](#numerical)
+      - [Enum](#enum)
+      - [Flag](#flag)
   - [Non-specific Data](#non-specific-data)
     - [Capacity](#capacity)
     - [Quality](#quality)
@@ -13,12 +58,6 @@ __Items__ in _Unturned_ encompass anything that can be carried in a player's in-
     - [Blueprints](#blueprints)
     - [Actions](#actions)
   - [Asset Bundles and Error Handling](#asset-bundles-and-error-handling)
-  - [Attachments](#attachments)
-    - [Barrels](#barrels)
-    - [Grips](#grips)
-    - [Magazines](#magazines)
-    - [Sights](#sights)
-    - [Tacticals](#tacticals)
   - [Barricades](#barricades)
     - [Beacons](#beacons)
     - [Experience Storages](#experience-storages)
@@ -30,10 +69,24 @@ __Items__ in _Unturned_ encompass anything that can be carried in a player's in-
     - [Remote Explosives](#remote-explosives)
     - [Robotic Turrets](#robotic-turrets)
     - [Traps](#traps)
+  - [Box](#box)
+  - [Attachments](#attachments)
+    - [Barrels](#barrels)
+    - [Grips](#grips)
+    - [Magazines](#magazines)
+    - [Sights](#sights)
+    - [Tacticals](#tacticals)
   - [Clothing](#clothing)
-    - [Glasses](#glasses)
+    - [Bag](#bag)
+      - [Backpack](#backpack)
+      - [Pants](#pants)
+      - [Shirt](#shirt)
+      - [Vests](#vests)
+    - [Gear](#gear)
+      - [Glasses](#glasses)
+      - [Hat](#hat)
+      - [Mask](#mask)
     - [Body Mesh Replacements](#body-mesh-replacements)
-    - [Vests](#vests)
   - [Consumables](#consumables)
   - [Crafting Supplies](#crafting-supplies)
   - [Fishing Poles](#fishing-poles)
@@ -63,779 +116,923 @@ __Items__ in _Unturned_ encompass anything that can be carried in a player's in-
 
 This first set of data is universal, and is applicable to any item type. Some of this data is required in order for the item to function.
 
-__GUID__: The GUID is automatically generated for the item when the game is launched. If it is not automatically generated, then it is assumable that the content was not set up properly.
+**GUID**: The GUID is automatically generated for the item when the game is launched. If it is not automatically generated, then it is assumable that the content was not set up properly.
 
-__Type__: Each category of item has its own type. The type to use can be found for each specific item category below, and is used for the item's context type as viewed in the context menu.
+**Type**: Each category of item has its own type. The type to use can be found for each specific item category below, and is used for the item's context type as viewed in the context menu.
 
-__Rarity__: `Common`, `Uncommon`, `Rare`, `Epic`, `Legendary`, `Mythical`. Defaults to common.
+**Rarity**: `Common`, `Uncommon`, `Rare`, `Epic`, `Legendary`, `Mythical`. Defaults to common.
 
-__Useable__: This defines which class to use for the item when equipped. If unspecified it will default to None, meaning that the item cannot be equipped. Which value to use for equippable items can be found below for each item category.
+**Useable**: Defines which class to use for the item when equipped. If unspecified it will default to None, meaning that the item cannot be equipped. Which value to use for equippable items can be found below for each item category.
 
-__Slot__: `Primary`, `Secondary`, `Any`
+**Slot**: `Primary`, `Secondary`, `Any`
 
-__ID__: The item ID is used to spawn the item into the game, and is represented as an unsigned 16 bit integer (a range of 0–65535). It is recommended not to use a value less than 2,000 as those are reserved for official content. It is also recommended to avoid any ID range being used by curated content, as those are often used by modded servers and custom Workshop maps.
+**ID**: The item ID is used to spawn the item into the game, and is represented as an unsigned 16 bit integer (a range of 0–65535). It is recommended not to use a value less than 2,000 as those are reserved for official content. It is also recommended to avoid any ID range being used by curated content, as those are often used by modded servers and custom Workshop maps.
 
-__Size_X__: The width of the item in the inventory.
+**Size_X**: The width of the item in the inventory.
 
-__Size_Y__: The height of the item in the inventory.
+**Size_Y**: The height of the item in the inventory.
 
-__Size_Z__: The size of the camera for item icons.
+**Size_Z**: The size of the camera for item icons.
 
-__Size2_Z__:
+**Size2_Z**:
 
-__Can_Use_Underwater__: `false`, `true`. Applicable to equipable items, and defaults to false for primary weapons.
+**Can_Use_Underwater**: `false`, `true`. Applicable to equipable items, and defaults to false for primary weapons.
 
-__Should_Drop_On_Death__: `false`, `true`. Defaults to true.
+**Should_Drop_On_Death**: `false`, `true`. Defaults to true.
 
-__Should_Delete_At_Zero_Quality__: `false`, `true`. Applicable to usable items, and defaults to false.
+**Should_Delete_At_Zero_Quality**: `false`, `true`. Applicable to usable items, and defaults to false.
 
-__Allow_Manual_Drop__: `false`, `true`. Defaults to true.
+**Allow_Manual_Drop**: `false`, `true`. Defaults to true.
 
-__Backward__: Specified if this item should be visually held in the opposite hand.
+**Backward**: Specified if this item should be visually held in the opposite hand.
 
 ### Capacity
 
-__Amount__: Maximum capacity of a container.
+**Amount**: Maximum capacity of a container.
 
-__Count_Min__: The minimum amount to generate in the container.
+**Count_Min**: The minimum amount to generate in the container.
 
-__Count_Max__: The maximum amount to generate in the container.
+**Count_Max**: The maximum amount to generate in the container.
 
 ### Quality
 
-__Quality_Min__: The minimum quality to generate. Set to 10 by default.
+**Quality_Min**: The minimum quality to generate. Set to 10 by default.
 
-__Quality_Max__: The maximum quality to generate. Set to 90 by default.
+**Quality_Max**: The maximum quality to generate. Set to 90 by default.
 
-__Override_Show_Quality__:
+**Override_Show_Quality**:
 
-__Durability__: Either a decimal probability chance of quality loss upon action, or guaranteed loss and durability value is instead representative of the amount lost.
+**Durability**: Either a decimal probability chance of quality loss upon action, or guaranteed loss and durability value is instead representative of the amount lost.
 
 - _Canteens_: Guaranteed quality loss occurs upon drinking. Durability value represents the amount of quality loss.
 - _Melee Weapons_: Decimal probability chance of quality loss occurs upon hitting.
 - _Ranged Weapons_: Decimal probability chance of quality loss occurs upon shooting.
 
-__Wear__: Increment to degrade quality by. Only applicable to items where durability represents a decimal probability chance of quality loss.
+**Wear**: Increment to degrade quality by. Only applicable to items where durability represents a decimal probability chance of quality loss.
 
 ### Damage
 
 Damage data can be utilized by explosive consumables, explosive throwables, traps, remote explosives, melee weapons, and ranged weapons.
 
-__Player_Damage__: Base damage dealt to player entities, prior to calculating limb modifiers, and used independently from limb modifiers for explosive and trap damage.
+**Player_Damage**: Base damage dealt to player entities, prior to calculating limb modifiers, and used independently from limb modifiers for explosive and trap damage.
 
-__Player_Leg_Multiplier__: The multiplier of player_damage against player legs.
+**Player_Leg_Multiplier**: The multiplier of player_damage against player legs.
 
-__Player_Arm_Multiplier__: The multiplier of player_damage against player arms.
+**Player_Arm_Multiplier**: The multiplier of player_damage against player arms.
 
-__Player_Spine_Multiplier__: The multiplier of player_damage against player torso.
+**Player_Spine_Multiplier**: The multiplier of player_damage against player torso.
 
-__Player_Skull_Multiplier__: The multiplier of player_damage against player head.
+**Player_Skull_Multiplier**: The multiplier of player_damage against player head.
 
-__Instakill_Headshots__: `false`, `true`. Defaults to false. If true, headshots bypass hat armor on servers with Allow_Instakill_Headshots enabled.
+**Instakill_Headshots**: `false`, `true`. Defaults to false. If true, headshots bypass hat armor on servers with Allow_Instakill_Headshots enabled.
 
-__Player_Damage_Bleeding__: `Always`, `Default`, `Heal`, `Never`
+**Player_Damage_Bleeding**: `Always`, `Default`, `Heal`, `Never`
 
-__Player_Damage_Bones__: `Always`, `Heal`, `None`
+**Player_Damage_Bones**: `Always`, `Heal`, `None`
 
-__Player_Damage_Food__: Damage dealt to a player's food.
+**Player_Damage_Food**: Damage dealt to a player's food.
 
-__Player_Damage_Water__: Damage dealt to a player's water.
+**Player_Damage_Water**: Damage dealt to a player's water.
 
-__Player_Damage_Virus__: Damage dealt to a player's immunity.
+**Player_Damage_Virus**: Damage dealt to a player's immunity.
 
-__Player_Damage_Hallucination__: Length of hallucinations inflicted upon a player.
+**Player_Damage_Hallucination**: Length of hallucinations inflicted upon a player.
 
-__Zombie_Damage__: Base damage dealt to zombie entities, prior to calculating limb modifiers, and used independently from limb modifiers for explosive and trap damage.
+**Zombie_Damage**: Base damage dealt to zombie entities, prior to calculating limb modifiers, and used independently from limb modifiers for explosive and trap damage.
 
-__Zombie_Leg_Multiplier__: The multiplier of zombie_damage against zombie legs.
+**Zombie_Leg_Multiplier**: The multiplier of zombie_damage against zombie legs.
 
-__Zombie_Arm_Multiplier__: The multiplier of zombie_damage against zombie arms.
+**Zombie_Arm_Multiplier**: The multiplier of zombie_damage against zombie arms.
 
-__Zombie_Spine_Multiplier__: The multiplier of zombie_damage against zombie torso.
+**Zombie_Spine_Multiplier**: The multiplier of zombie_damage against zombie torso.
 
-__Zombie_Skull_Multiplier__: The multiplier of zombie_damage against zombie head.
+**Zombie_Skull_Multiplier**: The multiplier of zombie_damage against zombie head.
 
-__Animal_Damage__: Base damage dealt to animal entities, prior to calculating limb modifiers, and used independently from limb modifiers for explosive and trap damage.
+**Animal_Damage**: Base damage dealt to animal entities, prior to calculating limb modifiers, and used independently from limb modifiers for explosive and trap damage.
 
-__Animal_Leg_Multiplier__: The multiplier of animal_damage against animal limbs.
+**Animal_Leg_Multiplier**: The multiplier of animal_damage against animal limbs.
 
-__Animal_Spine_Multiplier__: The multiplier of animal_damage against animal torso.
+**Animal_Spine_Multiplier**: The multiplier of animal_damage against animal torso.
 
-__Animal_Skull_Multiplier__: The multiplier of animal_damage against animal head.
+**Animal_Skull_Multiplier**: The multiplier of animal_damage against animal head.
 
-__Barricade_Damage__: Damage dealt to barricades.
+**Barricade_Damage**: Damage dealt to barricades.
 
-__Structure_Damage__: Damage dealt to structures. Multiplied by 3 in single-player.
+**Structure_Damage**: Damage dealt to structures. Multiplied by 3 in single-player.
 
-__Vehicle_Damage__: Damage dealt to vehicles.
+**Vehicle_Damage**: Damage dealt to vehicles.
 
-__Resource_Damage__: Damage dealt to resources.
+**Resource_Damage**: Damage dealt to resources.
 
-__Object_Damage__: Damage dealt to objects.
+**Object_Damage**: Damage dealt to objects.
 
-__Invulnerable__: Specified if damage ignores structures, barricades, and vehicles that are considered invulnerable to low-power weaponry. Not applicable to explosive damage, which always ignores invulnerability.
+**Invulnerable**: Specified if damage ignores structures, barricades, and vehicles that are considered invulnerable to low-power weaponry. Not applicable to explosive damage, which always ignores invulnerability.
 
-__Range__: For ranged and melee weapons – max distance in meters before damage is no longer possible. For explosive weapons (including magazine attachments that generate explosive projectiles) – the radius of the explosion in meters.
+**Range**: For ranged and melee weapons – max distance in meters before damage is no longer possible. For explosive weapons (including magazine attachments that generate explosive projectiles) – the radius of the explosion in meters.
 
-__Explosive__: Specified if the explosive component is used.
+**Explosive**: Specified if the explosive component is used.
 
-__Explosion__: The visual effect ID to play as the explosion.
+**Explosion**: The visual effect ID to play as the explosion.
 
-__Spawn_Explosion_On_Dedicated_Server__:
+**Spawn_Explosion_On_Dedicated_Server**:
 
 ### Blueprints
 
-__Blueprints__: The number of blueprints available.
+**Blueprints**: The number of blueprints available.
 
-__Blueprint\_#\_Type__: `Ammo`, `Apparel`, `Barricade`, `Furniture`, `Gear`, `Repair`, `Structure`, `Supply`, `Tool`, `Utilities`
+**Blueprint\_#\_Type**: `Ammo`, `Apparel`, `Barricade`, `Furniture`, `Gear`, `Repair`, `Structure`, `Supply`, `Tool`, `Utilities`
 
-__Blueprint\_#\_Supplies__: The number of unique supplies required for the blueprint.
+**Blueprint\_#\_Supplies**: The number of unique supplies required for the blueprint.
 
-__Blueprint\_#\_Supply\_#\_ID__: The ID of the unique supply required.
+**Blueprint\_#\_Supply\_#\_ID**: The ID of the unique supply required.
 
-__Blueprint\_#\_Supply\_#\_Amount__: The amount of the unique supply required.
+**Blueprint\_#\_Supply\_#\_Amount**: The amount of the unique supply required.
 
-__Blueprint\_#\_Supply\_#\_Critical__: Specified if the unique supply is a prerequisite to showing the blueprint.
+**Blueprint\_#\_Supply\_#\_Critical**: Specified if the unique supply is a prerequisite to showing the blueprint.
 
-__Blueprint\_#\_Tool__: The ID of the unique non-consumed tool required.
+**Blueprint\_#\_Tool**: The ID of the unique non-consumed tool required.
 
-__Blueprint\_#\_Tool_Critical__: Specified if the unique non-consumed tool is a prerequisite to showing the blueprint.
+**Blueprint\_#\_Tool_Critical**: Specified if the unique non-consumed tool is a prerequisite to showing the blueprint.
 
-__Blueprint\_#\_Level__: The skill level needed.
+**Blueprint\_#\_Level**: The skill level needed.
 
-__Blueprint\_#\_Skill__: `Cook`, `Craft`, `None`, `Repair`. The skill required to craft – defaults to None.
+**Blueprint\_#\_Skill**: `Cook`, `Craft`, `None`, `Repair`. The skill required to craft – defaults to None.
 
-__Blueprint\_#\_Product__: The ID of the product created.
+**Blueprint\_#\_Product**: The ID of the product created.
 
-__Blueprint\_#\_Products__: The amount of the product created.
+**Blueprint\_#\_Products**: The amount of the product created.
 
-__Blueprint\_#\_Outputs__: The number of unique products created from fulfilling the blueprint.
+**Blueprint\_#\_Outputs**: The number of unique products created from fulfilling the blueprint.
 
-__Blueprint\_#\_Output\_#\_ID__: The ID of the unique product created.
+**Blueprint\_#\_Output\_#\_ID**: The ID of the unique product created.
 
-__Blueprint\_#\_Output\_#\_Amount__: The amount of the unique product created.
+**Blueprint\_#\_Output\_#\_Amount**: The amount of the unique product created.
 
-__Blueprint\_#\_Build__: The auditory effect ID to play.
+**Blueprint\_#\_Build**: The auditory effect ID to play.
 
-__Blueprint\_#\_Map__: Name of the map the condition applies to.
+**Blueprint\_#\_Map**: Name of the map the condition applies to.
 
-__Blueprint\_#\_Conditions__: The number of required conditions.
+**Blueprint\_#\_Conditions**: The number of required conditions.
 
-__Blueprint\_#\_Condition\_#\_Type__: `Holiday`
+**Blueprint\_#\_Condition\_#\_Type**: `Holiday`
 
-__Blueprint\_#\_Condition\_#\_Value__: `Christmas`, `Halloween`
+**Blueprint\_#\_Condition\_#\_Value**: `Christmas`, `Halloween`
 
 ### Actions
 
-__Actions__: The number of actions available.
+**Actions**: The number of actions available.
 
-__Action\_#\_Type__: `Blueprint`
+**Action\_#\_Type**: `Blueprint`
 
-__Action\_#\_Source__: ID of the item with the blueprint this action should perform.
+**Action\_#\_Source**: ID of the item with the blueprint this action should perform.
 
-__Action\_#\_Blueprints__: The amount of the unique blueprint actions.
+**Action\_#\_Blueprints**: The amount of the unique blueprint actions.
 
-__Action\_#\_Blueprint\_#\_Index__: ID of the specific blueprint this action should perform.
+**Action\_#\_Blueprint\_#\_Index**: ID of the specific blueprint this action should perform.
 
-__Action\_#\_Key__: `Craft_Bandage`, `Craft_Dressing`, `Craft_Rag`, `Craft_Seed`
+**Action\_#\_Key**: `Craft_Bandage`, `Craft_Dressing`, `Craft_Rag`, `Craft_Seed`
 
 ## Asset Bundles and Error Handling
 
 See [AssetBundles.md](../AssetBundles.md) for full documentation regarding asset bundles.
 
-__Ignore_TexRW__: Specified if read/writeable texture errors for the item should be hidden from the error logs.
-
-## Attachments
-
-__Calibers__: The number of calibers applicable.
-
-__Caliber_#__: ID of an applicable caliber.
-
-__Recoil_X__: Decimal amount to multiply horizontal look recoil by.
-
-__Recoil_Y__: Decimal amount to multiply vertical look recoil by.
-
-__Spread__: Decimal amount to multiply spread by.
-
-__Shake__: Decimal amount to multiply physical recoil by.
-
-__Damage__: Decimal amount to multiply damage by.
-
-__Paintable__: Specified if skins can retexture the attachment.
-
-### Barrels
-
-__Type__: `Barrel`
-
-__Braked__: Specified if a muzzle flash is hidden.
-
-__Silenced__: Specified if alerts are not generated.
-
-__Volume__: Amount to multiply gunfire sound volume.
-
-### Grips
-
-__Type__: `Grip`
-
-__Bipod__: Specified if effects only take place when prone.
-
-### Magazines
-
-__Type__: `Magazine`
-
-__Pellets__: Number of bullet rays shot.
-
-__Tracer__: Tracer effect ID.
-
-__Impact__: Impact effect ID.
-
-__Speed__: Multiplier on reload speed.
-
-__Stuck__: Amount of quality to lose when hit. Fired projectiles can be picked back up until quality reaches 0.
-
-__Projectile_Damage_Multiplier__: Multiplier on the damage dealt by projectile weapons.
-
-__Projectile_Blast_Radius_Multiplier__: Multiplier on the blast radius of projectiles fired from projectile weapons.
-
-__Projectile_Launch_Force_Multiplier__: Multiplier on the launch force applied to projectiles fired from projectile weapons.
-
-__Should_Fill_After_Detach__: Specified if ammunition is fully refilled when reloaded, effectively allowing for infinite ammunition only limited by reload time.
-
-__Delete_Empty__: Specified if the magazine should be deleted when depleted.
-
-Limb-independent damage is also applicable.
-
-### Sights
-
-__Type__: `Sight`
-
-__Zoom__: Multiplicative amount of zoom.
-
-### Tacticals
-
-__Type__: `Tactical`
-
-__Firerate__: Amount to decrease minimum fire rate delay.
-
-__Laser__: Specified if a laser can be toggled.
-
-__Light__: Specified if a light can be toggled.
-
-__Rangefinder__: Specified if a rangefinder can be toggled.
-
-__Melee__: Specified if a melee attack can be performed.
+**Ignore_TexRW**: Specified if read/writeable texture errors for the item should be hidden from the error logs.
 
 ## Barricades
 
-__Type__: `Barricade`
+**Type**: `Barricade`
 
-__Useable__: `Barricade`
+**Useable**: `Barricade`
 
-__Build__: `Barrel_Rain`, `Barricade`, `Bed`, `Cage`, `Campfire`, `Claim`, `Clock`, `Door`, `Fortification`, `Freeform`, `Gate`, `Glass`, `Hatch`, `Ladder`, `Mannequin`, `Note`, `Oven`, `Oxygenator`, `Safezone`, `Shutter`, `Sign`, `Sign_Wall`, `Spot`, `Stereo`, `Torch`, `Vehicle`
+**Build**: `Barrel_Rain`, `Barricade`, `Bed`, `Cage`, `Campfire`, `Claim`, `Clock`, `Door`, `Fortification`, `Freeform`, `Gate`, `Glass`, `Hatch`, `Ladder`, `Mannequin`, `Note`, `Oven`, `Oxygenator`, `Safezone`, `Shutter`, `Sign`, `Sign_Wall`, `Spot`, `Stereo`, `Torch`, `Vehicle`
 
-__Health__: Amount of health.
+**Health**: Amount of health.
 
-__Range__: Distance away the barricade can be placed from the player.
+**Range**: Distance away the barricade can be placed from the player.
 
-__Radius__:
+**Radius**:
 
-__Offset__: Inherent distance above the point to place.
+**Offset**: Inherent distance above the point to place.
 
-__Locked__: Usability/interactivity access restricted to owner.
+**Locked**: Usability/interactivity access restricted to owner.
 
-__Explosion__: Destruction effect ID.
+**Explosion**: Destruction effect ID.
 
-__Salvage_Duration_Multiplier__: Multiplier on salvage duration.
+**Salvage_Duration_Multiplier**: Multiplier on salvage duration.
 
-__Unpickupable__: Cannot be salvaged.
+**Unpickupable**: Cannot be salvaged.
 
-__Unrepairable__: Cannot be repaired.
+**Unrepairable**: Cannot be repaired.
 
-__Unsalvageable__: If damaged, salvaging yields no partial ingredients.
+**Unsalvageable**: If damaged, salvaging yields no partial ingredients.
 
-__Unsaveable__: Cannot be saved by the game.
+**Unsaveable**: Cannot be saved by the game.
 
-__Vulnerable__: Specified if the barricade can be destroyed by low-power weaponry.
+**Vulnerable**: Specified if the barricade can be destroyed by low-power weaponry.
 
-__Proof_Explosion__: Specified in immune to explosion damage.
+**Proof_Explosion**: Specified in immune to explosion damage.
 
-__Armor_Tier__: `High`. Doubles health value.
+**Armor_Tier**: `High`. Doubles health value.
 
-__Use_Water_Height_Transparent_Sort__:
+**Use_Water_Height_Transparent_Sort**:
 
-__Should_Close_When_Outside_Range__: `true`. Defaults to false. Only applicable to interactive barricades that generate a UI element, such as item storages and signs.
+**Should_Close_When_Outside_Range**: `true`. Defaults to false. Only applicable to interactive barricades that generate a UI element, such as item storages and signs.
 
-__Allow_Collision_While_Animating__: Allows animated interactables (e.g., doors) to perform collision movement upon players.
+**Allow_Collision_While_Animating**: Allows animated interactables (e.g., doors) to perform collision movement upon players.
 
-__Allow_Placement_On_Vehicle__: `false`, `true`. Defaults to false for beds and robotic turrets.
+**Allow_Placement_On_Vehicle**: `false`, `true`. Defaults to false for beds and robotic turrets.
 
 ### Beacons
 
-__Type__: `Beacon`
+**Type**: `Beacon`
 
-__Useable__: `Barricade`
+**Useable**: `Barricade`
 
-__Build__: `Beacon`
+**Build**: `Beacon`
 
-__Wave__: Number of zombies that must be killed.
+**Wave**: Number of zombies that must be killed.
 
-__Rewards__: Number of rewards spawned.
+**Rewards**: Number of rewards spawned.
 
-__Reward_ID__: Spawn table ID for rewards.
+**Reward_ID**: Spawn table ID for rewards.
 
 ### Experience Storages
 
-__Type__: `Library`
+**Type**: `Library`
 
-__Useable__: `Barricade`
+**Useable**: `Barricade`
 
-__Build__: `Library`
+**Build**: `Library`
 
-__Capacity__: Numerical maximum capacity of experience able to be stored.
+**Capacity**: Numerical maximum capacity of experience able to be stored.
 
-__Tax__: Percent tax on deposits.
+**Tax**: Percent tax on deposits.
 
 ### Generators
 
-__Type__: `Generator`
+**Type**: `Generator`
 
-__Useable__: `Barricade`
+**Useable**: `Barricade`
 
-__Build__: `Generator`
+**Build**: `Generator`
 
-__Capacity__: Numerical maximum capacity of fuel units able to be stored.
+**Capacity**: Numerical maximum capacity of fuel units able to be stored.
 
-__Wirerange__: Radius range in meters (representative of a sphere) for how large of an area is considered powered.
+**Wirerange**: Radius range in meters (representative of a sphere) for how large of an area is considered powered.
 
-__Burn__: Number of seconds before one fuel unit is burned.
+**Burn**: Number of seconds before one fuel unit is burned.
 
 ### Item Storages
 
-__Type__: `Storage`
+**Type**: `Storage`
 
-__Useable__: `Barricade`
+**Useable**: `Barricade`
 
-__Build__: `Storage`, `Storage_Wall`
+**Build**: `Storage`, `Storage_Wall`
 
-__Storage_X__: Horizontal storage space.
+**Storage_X**: Horizontal storage space.
 
-__Storage_Y__: Vertical storage space.
+**Storage_Y**: Vertical storage space.
 
-__Display__: Stored item is visible.
+**Display**: Stored item is visible.
 
 ### Liquid Storages
 
-__Type__: `Tank`
+**Type**: `Tank`
 
-__Useable__: `Barricade`
+**Useable**: `Barricade`
 
-__Build__: `Tank`
+**Build**: `Tank`
 
-__Source__: `Fuel`, `Water`
+**Source**: `Fuel`, `Water`
 
-__Resource__: Numerical maximum capacity of liquid units that can be stored. Water units are measured in potential drinking uses.
+**Resource**: Numerical maximum capacity of liquid units that can be stored. Water units are measured in potential drinking uses.
 
 ### Oil Pumps
 
-__Type__: `Oil_Pump`
+**Type**: `Oil_Pump`
 
-__Useable__: `Barricade`
+**Useable**: `Barricade`
 
-__Build__: `Oil`
+**Build**: `Oil`
 
-__Fuel_Capacity__: Numerical maximum capacity of fuel units able to be stored.
+**Fuel_Capacity**: Numerical maximum capacity of fuel units able to be stored.
 
 ### Plants
 
-__Type__: `Farm`
+**Type**: `Farm`
 
-__Useable__: `Barricade`
+**Useable**: `Barricade`
 
-__Build__: `Farm`
+**Build**: `Farm`
 
-__Growth__: Number of seconds required to fully grow.
+**Growth**: Number of seconds required to fully grow.
 
-__Grow__: ID of the item generated when harvesting a fully grown plant.
+**Grow**: ID of the item generated when harvesting a fully grown plant.
 
 ### Remote Explosives
 
-__Type__: `Charge`
+**Type**: `Charge`
 
-__Useable__: `Barricade`
+**Useable**: `Barricade`
 
-__Build__: `Charge`
+**Build**: `Charge`
 
-__Range2__: Meter radius of range for explosive damage.
+**Range2**: Meter radius of range for explosive damage.
 
-__Explosion2__: Explosion effect ID for the damaging explosion.
+**Explosion2**: Explosion effect ID for the damaging explosion.
 
 Limb-independent entity damage is also applicable.
 
 ### Robotic Turrets
 
-__Type__: `Sentry`, `Sentry_Freeform`
+**Type**: `Sentry`, `Sentry_Freeform`
 
-__Useable__: `Barricade`
+**Useable**: `Barricade`
 
-__Build__: `Sentry`
+**Build**: `Sentry`
 
-__Storage_X__: Horizontal storage space.
+**Storage_X**: Horizontal storage space.
 
-__Storage_Y__: Vertical storage space.
+**Storage_Y**: Vertical storage space.
 
-__Display__: Stored item is visible.
+**Display**: Stored item is visible.
 
-__Mode__: `Friendly`, `Hostile`, `Neutral`
+**Mode**: `Friendly`, `Hostile`, `Neutral`
 
-__Infinite_Ammo__: Weapon ammunition never depletes.
+**Infinite_Ammo**: Weapon ammunition never depletes.
 
-__Infinite_Quality__: Weapon quality never depletes.
+**Infinite_Quality**: Weapon quality never depletes.
 
 ### Traps
 
-__Type__: `Trap`
+**Type**: `Trap`
 
-__Useable__: `Barricade`
+**Useable**: `Barricade`
 
-__Build__: `Spike`, `Wire`
+**Build**: `Spike`, `Wire`
 
-__Damage_Tires__: Specified if tires can be popped when ran over by a vehicle.
+**Damage\_Tires**: Specified if tires can be popped when ran over by a vehicle.
 
-__Range2__: Meter radius of range for explosive damage.
+**Player\_Damage**: a
 
-__Explosion2__: Explosion effect ID for the damaging explosion.
+**Zombie\_Damage**:
+
+**Animal\_Damage**:
+
+**Object\_Damage** <*Float*>:
+
+**Range2**: Meter radius of range for explosive damage.
+
+**Explosion2**: Explosion effect ID for the damaging explosion.
 
 Limb-independent entity damage is also applicable.
 
+## Box
+
+*Item Box Asset*
+
+**Type**: `Box`
+
+**Generate** <*int32*>:
+
+**Destroy** <*int32*>:
+
+**Drops** <*int32*>: Specify the number of drops you will provide.
+
+**Drop_#** <*int32*>:
+
+**Item_Origin** <*BoxItemOrigin*>: `Unbox`, `Unwrap`
+
+**Probability_Model** <*BoxProbabilityModel*>: `Original`, `Equalized`
+
+**Contains_Bonus_Items** <*Boolean*>:
+## Attachments
+
+*Item Caliber Asset*
+
+**Calibers** <*uint8*>: The number of calibers applicable.
+
+**Caliber\_#** <*uint16*>: ID of an applicable caliber.
+
+**Recoil\_X** <*float*>: Decimal amount to multiply horizontal look recoil by.
+
+**Recoil\_Y** <*float*>: Decimal amount to multiply vertical look recoil by.
+
+**Spread** <*float*>: Decimal amount to multiply spread by.
+
+**Sway** <*float*>:
+
+**Shake** <*float*>: Decimal amount to multiply physical recoil by.
+
+**Damage** <*float*>: Decimal amount to multiply damage by.
+
+**Firerate** <*uint8*>: Amount to decrease minimum fire rate delay by.
+
+**Ballistic\_Damage\_Multiplier** <*float*>:
+
+**Paintable** <*flag*>: Specified if skins can retexture the attachment.
+
+**Bipod** <*flag*>: Specified if effects only take place when prone.
+
+### Barrels
+
+**Type**: `Barrel`
+
+**Braked** <*flag*>: Specified if a muzzle flash is hidden.
+
+**Silenced** <*flag*>: Specified if alerts are not generated.
+
+**Volume** <*float*>: Amount to multiply gunfire sound volume.
+
+**Durability** <*uint8*: 1>:
+
+**Ballistic_Drop** <*float*>:
+
+**Gunshot_Rolloff_Distance_Multiplier** <*float* : `1.0`(Silenced),`0.5`(default)>
+
+### Grips
+
+**Type**: `Grip`
+
+No specific configuration, see [Attachments](#attachments)
+
+### Magazines
+
+**Type**: `Magazine`
+
+**Pellets** <*uint8*>: Number of bullet rays shot.
+
+**Stuck** <*uint8*>: Amount of quality to lose when hit. Fired projectiles can be picked back up until quality reaches 0.
+
+**Projectile_Damage_Multiplier** <*float*>: Multiplier on the damage dealt by projectile weapons.
+
+**Projectile_Blast_Radius_Multiplier** <*float*: 1>: Multiplier on the blast radius of projectiles fired from projectile weapons.
+
+**Projectile_Launch_Force_Multiplier** <*float*: 1>: Multiplier on the launch force applied to projectiles fired from projectile weapons.
+
+**Range** <*float*>:
+
+**Player_Damage** <*float*>:
+
+**Zombie_Damage** <*float*>:
+
+**Animal_Damage** <*float*>:
+
+**Barricade_Damage** <*float*>:
+
+**Structure_Damage** <*float*>:
+
+**Vehicle_Damage** <*`float`*>:
+
+**Resource_Damage** <*`float`*>:
+
+**Explosion_Launch_Speed** <*float*: `Player_Damage * 0.1`>:
+
+**Explosion**: <*uint16*>
+
+**Tracer**: Tracer effect ID.
+
+**Impact**: Impact effect ID.
+
+**Speed**: Multiplier on reload speed.
+
+**Explosive** <*flag*>:
+
+**Spawn_Explosion_On_Dedicated_Server** <*flag*>:
+
+**Delete_Empty**: Specified if the magazine should be deleted when depleted.
+
+**Should_Fill_After_Detach**: Specified if ammunition is fully refilled when reloaded, effectively allowing for infinite ammunition only limited by reload time.
+
+Limb-independent damage is also applicable.
+
+### Sights
+
+**Type**: `Sight`
+
+**Vision** <*LightingVision*>: `civilian`, `military`
+
+**Nightvision\_Color\_{R,G,B,A}** <*uint8*: `102, 102, 102, 0`(civilian), `20, 120, 80, 0.0`(military)>: Specify the color of the nightvision scope, all 4 key/value pairs do not need to be present. If they aren't present, the default value for the given type will be used.
+
+**Nightvision\_Fog\_Intensity** <*float*: `0.5`(civilian), `0.25`(military)>:
+
+**Zoom** <*float*>: Multiplicative amount of zoom. Must be at least 1.
+
+**Holographic** <*flag*>: Use the holographic sight effects .
+
+### Tacticals
+
+**Type**: `Tactical`
+
+**Laser** <*flag*>: Specified if a laser can be toggled.
+
+**Light** <*flag*>: Specified if a light can be toggled. If 
+
+  **SpotLight_Range** <*float*: `64`>:
+
+  **SpotLight_Angle** <*float*: `90`>:
+
+  **SpotLight_Intensity** <*float*: `1.3`>:
+
+  **SpotLight_Color\_{R,G,B,A}** <*uint8*: `245, 223, 147, 255`>:
+
+**Rangefinder** <*flag*>: Specified if a rangefinder can be toggled.
+
+**Melee** <*flag*>: Specified if a melee attack can be performed.
+
 ## Clothing
 
-__Type__: `Backpack`, `Glasses`, `Hat`, `Mask`, `Pants`, `Shirt`, `Vest`
+**Type**: `Backpack`, `Glasses`, `Hat`, `Mask`, `Pants`, `Shirt`, `Vest`
 
-__Useable__: `Backpack`, `Glasses`, `Hat`, `Mask`, `Pants`, `Shirt`, `Vest`
+**Useable**: `Backpack`, `Glasses`, `Hat`, `Mask`, `Pants`, `Shirt`, `Vest`
 
-__Armor__: Decimal multiplier on incoming damage.
+**Pro**: Specified if the item should be unable to spawn. Intended for cosmetics. Will disable the ability to change **Armor** through **Movement_Speed_Multiplier** properties.
 
-__Width__: The amount of horizontal storage space.
+**Armor** <*float*: `1`>: Incoming damage is multiplied by this value. i.e. .50 would half incoming damage.
 
-__Height__: The amount of vertical storage space.
+**Armor_Explosion** <*float*: *`Armor`*>: 
 
-__Hair__: Specified if hair shows up when wearing. Only applicable to hats, masks, and glasses.
+**Proof_Water** <*flag*>:
 
-__Beard__: Specified if beard shows up when wearing. Only applicable to hats, masks, and glasses.
+**Proof_Fire** <*flag*>:
 
-__Hair_Override__: Specified if hair material should be used. Only applicable to hats, masks, and glasses.
+**Proof_Radiation** <*flag*>:
 
-__Pro__: Specified if the item should be unable to spawn. Intended for cosmetics.
+**Movement_Speed_Multiplier** <*float*: `1`>:
 
-__Visible_On_Ragdoll__: `false`, `true`. Defaults to true.
+**Visible_On_Ragdoll** <*Boolean*: `true`>:
 
-### Glasses
+**Hair_Visible** <*Boolean*: `true`>:
 
-__Blindfold__: Specified if the player should be blinded when the glasses are worn.
+**Beard_Visible** <*Boolean*: `true`>:
 
-__Vision__: `Civilian`, `Headlamp`, `Military`
+**Mirror_Left_Handed_Model**  <*Boolean*: `true`>:
+
+### Bag
+
+This is solely a subclass and cannot be used on it's own.
+
+**Width** <*uint8*>: The amount of horizontal storage space.
+
+**Height** <*uint8*>: The amount of vertical storage space.
+
+#### Backpack
+
+See [Bag](#bag)
+
+#### Pants
+
+See [Bag](#bag)
+
+#### Shirt
+
+**Has_1P_Character_Mesh_Override** <*Boolean*: `false`>:
+
+**Character_Mesh_3P_Override_LODs** <*uint16*>:
+
+**Has_Character_Material_Override** <*Boolean*: `false`>:
+
+**Ignore_Hand** <*flag*>:
+
+#### Vests
+
+See [Bag](#bag)
+
+### Gear
+
+**Hair** <*flag*>: Specified if hair shows up when wearing.
+
+**Beard** <*flag*>: Specified if beard shows up when wearing.
+
+**Hair_Override** <*String*>: Specified if hair material should be used. Only applicable to hats, masks, and glasses.
+#### Glasses
+
+**Blindfold**: Specified if the player should be blinded when the glasses are worn.
+
+**Vision** <*LightingVision*>: `none`, `civilian`, `military`, `headlamp`. If this isn't present, you won't be able to use spotlight or nightvision properties
+
+**SpotLight_Range** <*float*: `64`>: Requires `headlamp` **Vision** type.
+
+**SpotLight_Angle** <*float*: `90`>: Requires `headlamp` **Vision** type.
+
+**SpotLight_Intensity** <*float*: `1.3`>: Requires `headlamp` **Vision** type.
+
+**SpotLight_Color\_{R,G,B,A}** <*uint8*: `245, 223, 147, 255`>: Requires `headlamp` **Vision** type.
+
+**Nightvision\_Color\_{R,G,B,A}** <*uint8*: `102, 102, 102, 0`(civilian), `20, 120, 80, 0.0`(military)>: Requires `civilian` or `military` **Vision** type. Specify the color of the nightvision, all 4 key/value pairs do not need to be present. If they aren't present, the default value for the given type will be used. The `G` and `B` values will be set to whatever the `R` value is by the game when the civilian night vision type is used, if you want to change these independently, you'll have to use the military vision type instead.
+
+**Nightvision\_Fog\_Intensity** <*float*: `0.5`(civilian), `0.25`(military)>: Requires `civilian` or `military` **Vision** type.
+
+**Blindfold** <*flag*>: Will blindfold the player when worn
+
+#### Hat
+
+See [Gear](#gear)
+
+#### Mask
+
+**Earpiece** <*flag*>:
 
 ### Body Mesh Replacements
 
 Body mesh replacements are only applicable to shirts. See [CharacterMeshReplacement.md](../CharacterMeshReplacement.md) for full documentation.
 
-__Has_1P_Character_Mesh_Override__: `false`, `true`
+**Has_1P_Character_Mesh_Override**: `false`, `true`
 
-__Character_Mesh_3P_Override_LODs__: Number of LODs.
+**Character_Mesh_3P_Override_LODs**: Number of LODs.
 
-__Has_Character_Material_Override__: `false`, `true`
+**Has_Character_Material_Override**: `false`, `true`
 
-__Hair_Visible__: `false`, `true`. Defaults to true.
+**Hair_Visible**: `false`, `true`. Defaults to true.
 
-__Beard_Visible__: `false`, `true`. Defaults to true.
-
-### Vests
+**Beard_Visible**: `false`, `true`. Defaults to true.
 
 ## Consumables
 
 Consumables in _Unturned_ encompass anything that is irreversibly consumed by the player on use, and directly affect a player's stats such as food or health.
 
-__Type__: `Food`, `Medical`, `Water`
+**Type**: `Food`, `Medical`, `Water`
 
-__Useable__: `Consumeable`
+**Useable**: `Consumeable`
 
-__Aid__: Specified if the item can be used on other players via right-click.
+**Aid**: Specified if the item can be used on other players via right-click.
 
-__Bleeding__: Specified if bleeding is healed. Deprecated in favor of Bleeding_Modifier.
+**Bleeding**: Specified if bleeding is healed. Deprecated in favor of Bleeding_Modifier.
 
-__Bleeding_Modifier__: `Cut`, `Heal`, `None`
+**Bleeding_Modifier**: `Cut`, `Heal`, `None`
 
-__Broken__: Specified if broken legs are healed. Deprecated in favor of Bones_Modifier.
+**Broken**: Specified if broken legs are healed. Deprecated in favor of Bones_Modifier.
 
-__Bones_Modifier__: `Break`, `Heal`, `None`
+**Bones_Modifier**: `Break`, `Heal`, `None`
 
-__Health__: The number of health to restore.
+**Health**: The number of health to restore.
 
-__Food__: The number of food to restore.
+**Food**: The number of food to restore.
 
-__Water__: The number of water to restore.
+**Water**: The number of water to restore.
 
-__Food_Constrains_Water__: Specified if max potential water gain should be capped by actual food gain. Applies to items where max potential water gain is less than max potential food gain.
+**Food_Constrains_Water**: Specified if max potential water gain should be capped by actual food gain. Applies to items where max potential water gain is less than max potential food gain.
 
-__Disinfectant__: The number of immunity to restore.
+**Disinfectant**: The number of immunity to restore.
 
-__Virus__: The number of immunity to deplete.
+**Virus**: The number of immunity to deplete.
 
-__Energy__: The number of energy to restore.
+**Energy**: The number of energy to restore.
 
-__Vision__: The length of hallucinations. The length does not stack with each time eaten, but the timer is reset for equal or longer Vision values relative to the remaining hallucination time.
+**Vision**: The length of hallucinations. The length does not stack with each time eaten, but the timer is reset for equal or longer Vision values relative to the remaining hallucination time.
 
-__Oxygen__: The number of oxygen to restore or deplete.
+**Oxygen**: The number of oxygen to restore or deplete.
 
-__Should_Delete_After_Use__: `false`, `true`. Defaults to true.
+**Should_Delete_After_Use**: `false`, `true`. Defaults to true.
 
-__Item_Reward_Spawn_ID__: ID of an item generated upon usage of the consumable.
+**Item_Reward_Spawn_ID**: ID of an item generated upon usage of the consumable.
 
-__Min_Item_Rewards__: Minimum possible amount of items rewarded.
+**Min_Item_Rewards**: Minimum possible amount of items rewarded.
 
-__Max_Item_Rewards__: Maximum possible amount of item rewarded.
+**Max_Item_Rewards**: Maximum possible amount of item rewarded.
 
 ## Crafting Supplies
 
-__Type__: `Supply`
+**Type**: `Supply`
 
 ## Fishing Poles
 
-__Type__: `Fisher`
+**Type**: `Fisher`
 
-__Useable__: `Fisher`
+**Useable**: `Fisher`
 
-__Reward_ID__: ID of the spawn table to pull catchable items from.
+**Reward_ID**: ID of the spawn table to pull catchable items from.
 
 ## Fuel Canisters
 
-__Type__: `Fuel`
+**Type**: `Fuel`
 
-__Useable__: `Fuel`
+**Useable**: `Fuel`
 
-__Fuel__: Amount of fuel units added to target.
+**Fuel**: Amount of fuel units added to target.
 
 ## Growth Supplements
 
-__Type__: `Grower`
+**Type**: `Grower`
 
-__Useable__: `Grower`
+**Useable**: `Grower`
 
 ## Mapping Equipment
 
-__Type__: `Map`, `Compass`
+**Type**: `Map`, `Compass`
 
-__Enables_Map__: Specified if this item provides a satellite map display.
+**Enables_Map**: Specified if this item provides a satellite map display.
 
-__Enables_Chart__: Specified if this item provides a chart map display.
+**Enables_Chart**: Specified if this item provides a chart map display.
 
-__Enables_Compass__: Specified if this item provides a compass display.
+**Enables_Compass**: Specified if this item provides a compass display.
 
 ## Melee Weapons
 
 ## Optics
 
-__Type__: `Optic`
+**Type**: `Optic`
 
-__Useable__: `Optic`
+**Useable**: `Optic`
 
-__Zoom__: Multiplicative amount of zoom.
+**Zoom**: Multiplicative amount of zoom.
 
 ## Parachutes
 
-__Type__: `Cloud`
+**Type**: `Cloud`
 
-__Useable__: `Cloud`
+**Useable**: `Cloud`
 
-__Gravity__: Decimal multiplier on the influence of gravity.
+**Gravity**: Decimal multiplier on the influence of gravity.
 
 ## Projectiles
 
-__Type__: `Throwable`
+**Type**: `Throwable`
 
-__Useable__: `Throwable`
+**Useable**: `Throwable`
 
-__Explode_On_Impact__: Specified if the projectile immediately explodes upon impact.
+**Explode_On_Impact**: Specified if the projectile immediately explodes upon impact.
 
-__Sticky__: Specified if the projectile sticks to objects upon impact.
+**Sticky**: Specified if the projectile sticks to objects upon impact.
 
-__Fuse_Length__: Timer in seconds for fuse length. Defaults to 2 seconds.
+**Fuse_Length**: Timer in seconds for fuse length. Defaults to 2 seconds.
 
 Limb-independent damage is also applicable.
 
 ## Radiation Filters
 
-__Type__: `Filter`
+**Type**: `Filter`
 
-__Useable__: `Filter`
+**Useable**: `Filter`
 
 ## Ranged Weapons
 
-__Type__: `Gun`
+**Type**: `Gun`
 
-__Useable__: `Gun`
+**Useable**: `Gun`
 
-__Barrel__: The barrel item ID to spawn attached.
+**Barrel**: The barrel item ID to spawn attached.
 
-__Grip__: The grip item ID to spawn attached.
+**Grip**: The grip item ID to spawn attached.
 
-__Sight__: The sight item ID to spawn attached.
+**Sight**: The sight item ID to spawn attached.
 
-__Tactical__: The tactical item ID to spawn attached.
+**Tactical**: The tactical item ID to spawn attached.
 
-__Hook_Barrel__: Specified if a barrel can be manually attached.
+**Hook_Barrel**: Specified if a barrel can be manually attached.
 
-__Hook_Grip__: Specified if a grip can be manually attached.
+**Hook_Grip**: Specified if a grip can be manually attached.
 
-__Hook_Sight__: Specified if a sight can be manually attached.
+**Hook_Sight**: Specified if a sight can be manually attached.
 
-__Hook_Tactical__: Specified if a tactical can be manually attached.
+**Hook_Tactical**: Specified if a tactical can be manually attached.
 
-__Magazine__: The magazine item ID to spawn attached.
+**Magazine**: The magazine item ID to spawn attached.
 
-__Magazine_Replacements__: Number of unique conditions with alternative default magazine attachments.
+**Magazine_Replacements**: Number of unique conditions with alternative default magazine attachments.
 
-__Magazine_Replacement\_#\_Map__: Name of the map the condition applies to.
+**Magazine_Replacement\_#\_Map**: Name of the map the condition applies to.
 
-__Magazine_Replacement\_#\_ID__: ID of the alternative magazine attachment.
+**Magazine_Replacement\_#\_ID**: ID of the alternative magazine attachment.
 
-__Ammo_Min__: The minimum amount of ammo to generate.
+**Ammo_Min**: The minimum amount of ammo to generate.
 
-__Ammo_Max__: The maximum amount of ammo to generate.
+**Ammo_Max**: The maximum amount of ammo to generate.
 
-__Safety__: Specified if the safety firing mode can be swapped to.
+**Safety**: Specified if the safety firing mode can be swapped to.
 
-__Semi__: Specified if semi-automatic firing mode can be swapped to.
+**Semi**: Specified if semi-automatic firing mode can be swapped to.
 
-__Bursts__: Number of shots fired in a burst. Specified if burst firing mode can be swapped to.
+**Bursts**: Number of shots fired in a burst. Specified if burst firing mode can be swapped to.
 
-__Auto__: Specified if automatic firing mode can be swapped to.
+**Auto**: Specified if automatic firing mode can be swapped to.
 
-__Caliber__: The caliber ID to check for attachment compatibility.
+**Caliber**: The caliber ID to check for attachment compatibility.
 
-__Attachment_Calibers__: Number of unique attachment calibers.
+**Attachment_Calibers**: Number of unique attachment calibers.
 
-__Attachment_Caliber_#__: ID of applicable caliber for hook attachments.
+**Attachment_Caliber_#**: ID of applicable caliber for hook attachments.
 
-__Magazine_Calibers__: Number of unique magazine calibers.
+**Magazine_Calibers**: Number of unique magazine calibers.
 
-__Magazine_Caliber_#__: ID of applicable caliber for magazine attachments.
+**Magazine_Caliber_#**: ID of applicable caliber for magazine attachments.
 
-__Firerate__: The minimum number of ticks between the firing of each bullet.
+**Firerate**: The minimum number of ticks between the firing of each bullet.
 
-__Replace__: Multiplier of the reload animation length before the magazine is respawned.
+**Replace**: Multiplier of the reload animation length before the magazine is respawned.
 
-__Unplace__: Multiplier of the reload animation length before the magazine is despawned.
+**Unplace**: Multiplier of the reload animation length before the magazine is despawned.
 
-__Reload_Time__: Multiplier on reload animation length.
+**Reload_Time**: Multiplier on reload animation length.
 
-__Action__: `Bolt`, `Break`, `Minigun`, `Pump`, `Rail`, `Rocket`, `String`, `Trigger`. Rocket action has inherently explosive projectiles, uses ballistic force instead of alternative advanced ballistics options, and has infinite firing range.
+**Action**: `Bolt`, `Break`, `Minigun`, `Pump`, `Rail`, `Rocket`, `String`, `Trigger`. Rocket action has inherently explosive projectiles, uses ballistic force instead of alternative advanced ballistics options, and has infinite firing range.
 
-__Delete_Empty_Magazines__: Specified if the attached magazine should be deleted when depleted. Deprecated in favor of Should_Delete_Empty_Magazines.
+**Delete_Empty_Magazines**: Specified if the attached magazine should be deleted when depleted. Deprecated in favor of Should_Delete_Empty_Magazines.
 
-__Should_Delete_Empty_Magazines__: `false`, `true`. No applicable default flag. If set to true, it will override how empty magazines are handled by the action item mode.
+**Should_Delete_Empty_Magazines**: `false`, `true`. No applicable default flag. If set to true, it will override how empty magazines are handled by the action item mode.
 
-__Spread_Aim__: The spread multiplier when aiming down sights. This is multiplied by the spread_hip value.
+**Spread_Aim**: The spread multiplier when aiming down sights. This is multiplied by the spread_hip value.
 
-__Spread_Hip__: The spread multiplier when not aiming down sights.
+**Spread_Hip**: The spread multiplier when not aiming down sights.
 
-__Ballistic_Force__: Measured in Newtons. Primarily applicable to the rocket action, and usage ignores all other advanced ballistic options.
+**Ballistic_Force**: Measured in Newtons. Primarily applicable to the rocket action, and usage ignores all other advanced ballistic options.
 
-__Ballistic_Steps__: Defaults to (range / 10).
+**Ballistic_Steps**: Defaults to (range / 10).
 
-__Ballistic_Travel__: Defaults to 10.
+**Ballistic_Travel**: Defaults to 10.
 
-__Ballistic_Drop__: Defaults to 0.002.
+**Ballistic_Drop**: Defaults to 0.002.
 
-__Recoil_Aim__: Multiplier on all recoil parameters when aiming down sights. Defaults to 1.
+**Recoil_Aim**: Multiplier on all recoil parameters when aiming down sights. Defaults to 1.
 
-__Recoil_Min_X__: The minimum horizontal look recoil in degrees.
+**Recoil_Min_X**: The minimum horizontal look recoil in degrees.
 
-__Recoil_Min_Y__: The minimum vertical look recoil in degrees.
+**Recoil_Min_Y**: The minimum vertical look recoil in degrees.
 
-__Recoil_Max_X__: The maximum horizontal look recoil in degrees.
+**Recoil_Max_X**: The maximum horizontal look recoil in degrees.
 
-__Recoil_Max_Y__: The maximum vertical look recoil in degrees.
+**Recoil_Max_Y**: The maximum vertical look recoil in degrees.
 
-__Recover_X__: Multiplier on degrees to be counter-animated horizontally over the next 250 milliseconds.
+**Recover_X**: Multiplier on degrees to be counter-animated horizontally over the next 250 milliseconds.
 
-__Recovery_Y__: Multiplier on degrees to be counter-animated vertically over the next 250 milliseconds.
+**Recovery_Y**: Multiplier on degrees to be counter-animated vertically over the next 250 milliseconds.
 
-__Shake_Min_X__: The minimum X axis physical recoil.
+**Shake_Min_X**: The minimum X axis physical recoil.
 
-__Shake_Max_X__: The maximum X axis physical recoil.
+**Shake_Max_X**: The maximum X axis physical recoil.
 
-__Shake_Min_Y__: The minimum Y axis physical recoil.
+**Shake_Min_Y**: The minimum Y axis physical recoil.
 
-__Shake_Max_Y__: The maximum Y axis physical recoil.
+**Shake_Max_Y**: The maximum Y axis physical recoil.
 
-__Shake_Min_Z__: The minimum Z axis physical recoil.
+**Shake_Min_Z**: The minimum Z axis physical recoil.
 
-__Shake_Max_Z__: The maximum Z axis physical recoil.
+**Shake_Max_Z**: The maximum Z axis physical recoil.
 
-__Muzzle__: The muzzle effect ID to play when shooting.
+**Muzzle**: The muzzle effect ID to play when shooting.
 
-__Shell__: The shell effect ID to play after shooting.
+**Shell**: The shell effect ID to play after shooting.
 
-__Turret__: Specified if the weapon should be treated as a vehicular turret.
+**Turret**: Specified if the weapon should be treated as a vehicular turret.
 
-__Can_Ever_Jam__: Specified if the weapon can jam.
+**Can_Ever_Jam**: Specified if the weapon can jam.
 
-__Jam_Quality_Threshold__: Decimal representative of the quality percentage threshold for jamming can begin to occur.
+**Jam_Quality_Threshold**: Decimal representative of the quality percentage threshold for jamming can begin to occur.
 
-__Jam_Max_Chance__: Decimal-to-percent chance for jamming to occur.
+**Jam_Max_Chance**: Decimal-to-percent chance for jamming to occur.
 
-__Unjam_Chamber_Anim__: Name of the animation clip to play for unjamming. Defaults to UnjamChamber.
+**Unjam_Chamber_Anim**: Name of the animation clip to play for unjamming. Defaults to UnjamChamber.
 
-__Can_Aim_During_Sprint__: Specified if the player can sprint while aiming down sights.
+**Can_Aim_During_Sprint**: Specified if the player can sprint while aiming down sights.
 
-__Ammo_Per_Shot__: Numeric option for ammunition consumed per shot.
+**Ammo_Per_Shot**: Numeric option for ammunition consumed per shot.
 
-__Fire_Delay_Seconds__: Numeric option for the delay between initiating attempting to fire, and the actual firing of the weapon.
+**Fire_Delay_Seconds**: Numeric option for the delay between initiating attempting to fire, and the actual firing of the weapon.
 
-__Allow_Magazine_Change__: `false`, `true`. Defaults to true. If false, the magazine in the weapon cannot be reloaded, unloaded, or replaced.
+**Allow_Magazine_Change**: `false`, `true`. Defaults to true. If false, the magazine in the weapon cannot be reloaded, unloaded, or replaced.
 
 Damage data (explosive, limb-dependent, and limb-independent setups), durability, and wear are also applicable.
 
 ## Remote Triggers
 
-__Type__: `Detonator`
+**Type**: `Detonator`
 
-__Useable__: `Detonator`
+**Useable**: `Detonator`
 
 ## Restraining Devices
 
 ### Catchers
 
-__Type__: `Arrest_Start`
+**Type**: `Arrest_Start`
 
-__Useable__: `Arrest_Start`
+**Useable**: `Arrest_Start`
 
-__Strength__: Amount of effort required to break free.
+**Strength**: Amount of effort required to break free.
 
 ### Releasers
 
-__Type__: `Arrest_End`
+**Type**: `Arrest_End`
 
-__Useable__: `Arrest_End`
+**Useable**: `Arrest_End`
 
-__Recover__: ID of the restraining device that can be unlocked with this item.
+**Recover**: ID of the restraining device that can be unlocked with this item.
 
 ## Structures
 
-__Type__: `Structure`
+**Type**: `Structure`
 
-__Useable__: `Structure`
+**Useable**: `Structure`
 
-__Construct__: `Floor`, `Floor_Poly`, `Pillar`, `Post`, `Rampart`, `Roof`, `Roof_Poly`, `Wall`
+**Construct**: `Floor`, `Floor_Poly`, `Pillar`, `Post`, `Rampart`, `Roof`, `Roof_Poly`, `Wall`
 
-__Health__: Amount of health.
+**Health**: Amount of health.
 
-__Range__: Distance away the barricade can be placed from the player.
+**Range**: Distance away the barricade can be placed from the player.
 
-__Explosion__: Destruction effect ID.
+**Explosion**: Destruction effect ID.
 
-__Foliage_Cut_Radius__: Numerical value in meters for the radius in which foliage is removed from around the structure. Only applicable to floor structure types.
+**Foliage_Cut_Radius**: Numerical value in meters for the radius in which foliage is removed from around the structure. Only applicable to floor structure types.
 
 ## Tools
 
@@ -843,48 +1040,48 @@ __Foliage_Cut_Radius__: Numerical value in meters for the radius in which foliag
 
 Car jacks launch vehicles into the air as a method of reorienting them if they were flipped over.
 
-__Type__: `Tool`
+**Type**: `Tool`
 
-__Useable__: `Carjack`
+**Useable**: `Carjack`
 
 ### Car Lock Picks
 
 Car lock picks allow players to unlock any locked vehicle, but are single-use.
 
-__Type__: `Tool`
+**Type**: `Tool`
 
-__Useable__: `Carlockpick`
+**Useable**: `Carlockpick`
 
 ### Tire Replacements
 
 Tire replacements allow for adding or removing tires from four-wheeled vehicles.
 
-__Type__: `Tire`
+**Type**: `Tire`
 
-__Useable__: `Tire`
+**Useable**: `Tire`
 
-__Mode__: `Add`, `Remove`
+**Mode**: `Add`, `Remove`
 
 ### Vehicle Batteries
 
 Vehicle batteries can be placed into vehicles, allowing them to perform activities that consume electrical energy rather than fuel. They are affected by quality.
 
-__Type__: `Vehicle_Repair_Tool`
+**Type**: `Vehicle_Repair_Tool`
 
-__Useable__: `Battery_Vehicle`
+**Useable**: `Battery_Vehicle`
 
 ### Walkie-talkies
 
 When initiating voice chat with a walkie-talkie held, voice is transmitted through a two-way radio. An audible cue plays when initiating voice chat.
 
-__Type__: `Tool`
+**Type**: `Tool`
 
-__Useable__: `Walkie_Talkie`
+**Useable**: `Walkie_Talkie`
 
 ## Water Canisters
 
-__Type__: `Refill`
+**Type**: `Refill`
 
-__Useable__: `Refill`
+**Useable**: `Refill`
 
-__Water__: The number of water to restore.
+**Water**: The number of water to restore.
